@@ -1,8 +1,10 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { Bath, Car, BedDouble, MapPin } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 interface PropertyCardProps {
+  id: number;
   name: string;
   price: string;
   image: string;
@@ -12,14 +14,17 @@ interface PropertyCardProps {
   address: string;
 }
 
-const PropertyCard = ({ name, price, image, baths, beds, cars, address }: PropertyCardProps) => {
+const PropertyCard = ({ id, name, price, image, baths, beds, cars, address }: PropertyCardProps) => {
+  const navigate = useNavigate();
+
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
       whileHover={{ y: -5 }}
       transition={{ duration: 0.3 }}
-      className="group bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300"
+      className="group bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 cursor-pointer"
+      onClick={() => navigate(`/property/${id}`)}
     >
       <div className="relative aspect-[4/3] overflow-hidden">
         <img
