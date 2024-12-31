@@ -1,6 +1,6 @@
 import React from "react";
 import { motion } from "framer-motion";
-import { Bath, Car, BedDouble } from "lucide-react";
+import { Bath, Car, BedDouble, MapPin } from "lucide-react";
 
 interface PropertyCardProps {
   name: string;
@@ -9,9 +9,10 @@ interface PropertyCardProps {
   baths: number;
   beds: number;
   cars: number;
+  address: string;
 }
 
-const PropertyCard = ({ name, price, image, baths, beds, cars }: PropertyCardProps) => {
+const PropertyCard = ({ name, price, image, baths, beds, cars, address }: PropertyCardProps) => {
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0.95 }}
@@ -33,6 +34,11 @@ const PropertyCard = ({ name, price, image, baths, beds, cars }: PropertyCardPro
         <div className="flex justify-between items-start">
           <h3 className="font-semibold text-lg line-clamp-1">{name}</h3>
           <span className="text-primary font-bold">{price}</span>
+        </div>
+
+        <div className="flex items-center gap-1 text-muted-foreground">
+          <MapPin size={16} />
+          <span className="text-sm line-clamp-1">{address}</span>
         </div>
         
         <div className="flex items-center gap-4 text-gray-600">

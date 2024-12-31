@@ -10,6 +10,7 @@ const properties = [
     baths: 3,
     beds: 4,
     cars: 2,
+    address: "123 Luxury Lane, Beverly Hills, CA",
   },
   {
     id: 2,
@@ -19,6 +20,7 @@ const properties = [
     baths: 4,
     beds: 5,
     cars: 3,
+    address: "456 Elite Avenue, Manhattan, NY",
   },
   {
     id: 3,
@@ -28,6 +30,7 @@ const properties = [
     baths: 2,
     beds: 3,
     cars: 1,
+    address: "789 Urban Street, Downtown, LA",
   },
   {
     id: 4,
@@ -37,6 +40,7 @@ const properties = [
     baths: 3,
     beds: 4,
     cars: 2,
+    address: "321 Ocean Drive, Miami Beach, FL",
   },
   {
     id: 5,
@@ -46,6 +50,7 @@ const properties = [
     baths: 2,
     beds: 2,
     cars: 1,
+    address: "555 Metropolitan Ave, Brooklyn, NY",
   },
   {
     id: 6,
@@ -55,6 +60,7 @@ const properties = [
     baths: 5,
     beds: 6,
     cars: 4,
+    address: "888 Garden Road, Greenwich, CT",
   },
 ];
 
