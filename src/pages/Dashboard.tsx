@@ -49,7 +49,7 @@ const dummyProperties = Array.from({ length: 50 }, (_, i) => ({
 const Dashboard = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
   const { toast } = useToast();
   const itemsPerPage = 10;
 
@@ -65,7 +65,7 @@ const Dashboard = () => {
   const filteredProperties = dummyProperties.filter(
     (property) =>
       property.address.toLowerCase().includes(searchTerm.toLowerCase()) &&
-      (statusFilter === "" || property.status === statusFilter)
+      (statusFilter === "all" || property.status === statusFilter)
   );
 
   // Calculate pagination
@@ -122,7 +122,7 @@ const Dashboard = () => {
             <SelectValue placeholder="Filter by status" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">All Status</SelectItem>
+            <SelectItem value="all">All Status</SelectItem>
             <SelectItem value="For Sale">For Sale</SelectItem>
             <SelectItem value="Leased">Leased</SelectItem>
             <SelectItem value="Sold">Sold</SelectItem>
