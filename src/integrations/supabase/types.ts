@@ -9,7 +9,45 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      settings: {
+        Row: {
+          api_key: string
+          bearer_token: string
+          created_at: string
+          endpoint_for_lease: string | null
+          endpoint_for_sale: string | null
+          endpoint_leased: string | null
+          endpoint_sold: string | null
+          id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          api_key: string
+          bearer_token: string
+          created_at?: string
+          endpoint_for_lease?: string | null
+          endpoint_for_sale?: string | null
+          endpoint_leased?: string | null
+          endpoint_sold?: string | null
+          id?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          api_key?: string
+          bearer_token?: string
+          created_at?: string
+          endpoint_for_lease?: string | null
+          endpoint_for_sale?: string | null
+          endpoint_leased?: string | null
+          endpoint_sold?: string | null
+          id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

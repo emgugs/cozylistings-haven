@@ -7,31 +7,89 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 
 const DashboardSettings = () => {
-  const [apiKey, setApiKey] = useState(localStorage.getItem("apiKey") || "");
-  const [bearerToken, setBearerToken] = useState(localStorage.getItem("bearerToken") || "");
+  const [apiKey, setApiKey] = useState("");
+  const [bearerToken, setBearerToken] = useState("");
   const [endpoints, setEndpoints] = useState({
-    forSale: localStorage.getItem("endpoint_forSale") || "",
-    leased: localStorage.getItem("endpoint_leased") || "",
-    forLease: localStorage.getItem("endpoint_forLease") || "",
-    sold: localStorage.getItem("endpoint_sold") || "",
+    forSale: "",
+    leased: "",
+    forLease: "",
+    sold: "",
   });
+  const [loading, setLoading] = useState(false);
   const { toast } = useToast();
 
-  const handleSave = () => {
-    // Save API credentials
-    localStorage.setItem("apiKey", apiKey);
-    localStorage.setItem("bearerToken", bearerToken);
+  useEffect(() => {
+    fetchSettings();
+  }, []);
 
-    // Save endpoints
-    localStorage.setItem("endpoint_forSale", endpoints.forSale);
-    localStorage.setItem("endpoint_leased", endpoints.leased);
-    localStorage.setItem("endpoint_forLease", endpoints.forLease);
-    localStorage.setItem("endpoint_sold", endpoints.sold);
+  const fetchSettings = async () => {
+    try {
+      const { data: settings, error } = await supabase
+        .from("settings")
+        .select("*")
+        .single();
 
-    toast({
-      title: "Settings Saved",
-      description: "Your API settings have been saved successfully.",
-    });
+      if (error) throw error;
+
+      if (settings) {
+        setApiKey(settings.api_key);
+        setBearerToken(settings.bearer_token);
+        setEndpoints({
+          forSale: settings.endpoint_for_sale || "",
+          leased: settings.endpoint_leased || "",
+          forLease: settings.endpoint_for_lease || "",
+          sold: settings.endpoint_sold || "",
+        });
+      }
+    } catch (error) {
+      console.error("Error fetching settings:", error);
+    }
+  };
+
+  const handleSave = async () => {
+    setLoading(true);
+    try {
+      const { data: existingSettings } = await supabase
+        .from("settings")
+        .select("id")
+        .single();
+
+      const settingsData = {
+        api_key: apiKey,
+        bearer_token: bearerToken,
+        endpoint_for_sale: endpoints.forSale,
+        endpoint_leased: endpoints.leased,
+        endpoint_for_lease: endpoints.forLease,
+        endpoint_sold: endpoints.sold,
+        user_id: (await supabase.auth.getUser()).data.user?.id,
+      };
+
+      let error;
+      if (existingSettings) {
+        ({ error } = await supabase
+          .from("settings")
+          .update(settingsData)
+          .eq("id", existingSettings.id));
+      } else {
+        ({ error } = await supabase.from("settings").insert([settingsData]));
+      }
+
+      if (error) throw error;
+
+      toast({
+        title: "Settings Saved",
+        description: "Your API settings have been saved successfully.",
+      });
+    } catch (error) {
+      console.error("Error saving settings:", error);
+      toast({
+        title: "Error",
+        description: "Failed to save settings. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleTestConnection = async (endpoint: string) => {
@@ -64,7 +122,9 @@ const DashboardSettings = () => {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold">API Settings</h2>
-        <Button onClick={handleSave}>Save Settings</Button>
+        <Button onClick={handleSave} disabled={loading}>
+          {loading ? "Saving..." : "Save Settings"}
+        </Button>
       </div>
 
       <Card className="p-6 space-y-6">
@@ -117,6 +177,7 @@ const DashboardSettings = () => {
                 <Button 
                   onClick={() => handleTestConnection(endpoints[key as keyof typeof endpoints])}
                   variant="outline"
+                  disabled={loading}
                 >
                   Test
                 </Button>
