@@ -1,9 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 
 const DashboardSettings = () => {
   const [apiKey, setApiKey] = useState(localStorage.getItem("apiKey") || "");
@@ -17,9 +17,11 @@ const DashboardSettings = () => {
   const { toast } = useToast();
 
   const handleSave = () => {
-    // Save to localStorage
+    // Save API credentials
     localStorage.setItem("apiKey", apiKey);
     localStorage.setItem("bearerToken", bearerToken);
+
+    // Save endpoints
     localStorage.setItem("endpoint_forSale", endpoints.forSale);
     localStorage.setItem("endpoint_leased", endpoints.leased);
     localStorage.setItem("endpoint_forLease", endpoints.forLease);
@@ -29,6 +31,36 @@ const DashboardSettings = () => {
       title: "Settings Saved",
       description: "Your API settings have been saved successfully.",
     });
+  };
+
+  const handleTestConnection = async (endpoint: string) => {
+    try {
+      const response = await fetch(endpoint, {
+        headers: {
+          'X-Api-Key': apiKey,
+          'Authorization': `Bearer ${bearerToken}`,
+          'Accept': 'application/json',
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log('API Response:', data);
+        toast({
+          title: "Connection Successful",
+          description: "Successfully connected to the API endpoint.",
+        });
+      } else {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+    } catch (error) {
+      console.error('API Test Error:', error);
+      toast({
+        title: "Connection Failed",
+        description: "Failed to connect to the API endpoint. Please check your settings.",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
@@ -41,12 +73,13 @@ const DashboardSettings = () => {
       <Card className="p-6 space-y-6">
         <div className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="apiKey">API Key</Label>
+            <Label htmlFor="apiKey">X-Api-Key</Label>
             <Input
               id="apiKey"
               value={apiKey}
               onChange={(e) => setApiKey(e.target.value)}
               placeholder="Enter your API key"
+              type="password"
             />
           </div>
 
@@ -57,6 +90,7 @@ const DashboardSettings = () => {
               value={bearerToken}
               onChange={(e) => setBearerToken(e.target.value)}
               placeholder="Enter your Bearer token"
+              type="password"
             />
           </div>
         </div>
@@ -65,53 +99,33 @@ const DashboardSettings = () => {
       <Card className="p-6">
         <h3 className="text-lg font-semibold mb-4">Endpoint Settings</h3>
         <div className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="forSale">For Sale Endpoint</Label>
-            <Input
-              id="forSale"
-              value={endpoints.forSale}
-              onChange={(e) =>
-                setEndpoints({ ...endpoints, forSale: e.target.value })
-              }
-              placeholder="Enter For Sale endpoint URL"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="leased">Leased Endpoint</Label>
-            <Input
-              id="leased"
-              value={endpoints.leased}
-              onChange={(e) =>
-                setEndpoints({ ...endpoints, leased: e.target.value })
-              }
-              placeholder="Enter Leased endpoint URL"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="forLease">For Lease Endpoint</Label>
-            <Input
-              id="forLease"
-              value={endpoints.forLease}
-              onChange={(e) =>
-                setEndpoints({ ...endpoints, forLease: e.target.value })
-              }
-              placeholder="Enter For Lease endpoint URL"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="sold">Sold Endpoint</Label>
-            <Input
-              id="sold"
-              value={endpoints.sold}
-              onChange={(e) =>
-                setEndpoints({ ...endpoints, sold: e.target.value })
-              }
-              placeholder="Enter Sold endpoint URL"
-            />
-          </div>
+          {[
+            { key: 'forSale', label: 'For Sale Endpoint' },
+            { key: 'leased', label: 'Leased Endpoint' },
+            { key: 'forLease', label: 'For Lease Endpoint' },
+            { key: 'sold', label: 'Sold Endpoint' }
+          ].map(({ key, label }) => (
+            <div key={key} className="space-y-2">
+              <Label htmlFor={key}>{label}</Label>
+              <div className="flex gap-2">
+                <Input
+                  id={key}
+                  value={endpoints[key as keyof typeof endpoints]}
+                  onChange={(e) =>
+                    setEndpoints({ ...endpoints, [key]: e.target.value })
+                  }
+                  placeholder={`Enter ${label} URL`}
+                  className="flex-1"
+                />
+                <Button 
+                  onClick={() => handleTestConnection(endpoints[key as keyof typeof endpoints])}
+                  variant="outline"
+                >
+                  Test
+                </Button>
+              </div>
+            </div>
+          ))}
         </div>
       </Card>
     </div>
