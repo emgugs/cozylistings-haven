@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 const DashboardSettings = () => {
   const [apiKey, setApiKey] = useState(localStorage.getItem("apiKey") || "");
@@ -35,24 +36,20 @@ const DashboardSettings = () => {
 
   const handleTestConnection = async (endpoint: string) => {
     try {
-      const response = await fetch(endpoint, {
+      const { data: functionUrl } = await supabase.functions.invoke('vaultre-proxy', {
+        body: JSON.stringify({ endpoint }),
         headers: {
-          'X-Api-Key': apiKey,
-          'Authorization': `Bearer ${bearerToken}`,
-          'Accept': 'application/json',
+          'x-api-key': apiKey,
+          'authorization': `Bearer ${bearerToken}`,
         },
       });
 
-      if (response.ok) {
-        const data = await response.json();
-        console.log('API Response:', data);
-        toast({
-          title: "Connection Successful",
-          description: "Successfully connected to the API endpoint.",
-        });
-      } else {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
+      toast({
+        title: "Connection Successful",
+        description: "Successfully connected to the API endpoint.",
+      });
+      
+      console.log('API Response:', functionUrl);
     } catch (error) {
       console.error('API Test Error:', error);
       toast({
