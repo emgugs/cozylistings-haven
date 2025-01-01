@@ -3,6 +3,7 @@ import Index from "./pages/Index";
 import PropertyDetails from "./pages/PropertyDetails";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
+import DashboardSettings from "./pages/DashboardSettings";
 import DashboardLayout from "./components/dashboard/DashboardLayout";
 import { Toaster } from "./components/ui/toaster";
 
@@ -15,6 +16,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/dashboard" element={<DashboardLayout />}>
           <Route index element={<Dashboard />} />
+          <Route path="settings" element={<DashboardSettings />} />
         </Route>
       </Routes>
       <Toaster />
