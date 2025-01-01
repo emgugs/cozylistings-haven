@@ -24,10 +24,22 @@ const DashboardSettings = () => {
 
   const fetchSettings = async () => {
     try {
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        toast({
+          title: "Authentication Required",
+          description: "Please log in to manage settings.",
+          variant: "destructive",
+        });
+        return;
+      }
+
       const { data: settings, error } = await supabase
         .from("settings")
         .select("*")
-        .single();
+        .eq("user_id", user.id)
+        .maybeSingle();
 
       if (error) throw error;
 
@@ -43,16 +55,27 @@ const DashboardSettings = () => {
       }
     } catch (error) {
       console.error("Error fetching settings:", error);
+      toast({
+        title: "Error",
+        description: "Failed to fetch settings. Please try again.",
+        variant: "destructive",
+      });
     }
   };
 
   const handleSave = async () => {
     setLoading(true);
     try {
-      const { data: existingSettings } = await supabase
-        .from("settings")
-        .select("id")
-        .single();
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        toast({
+          title: "Authentication Required",
+          description: "Please log in to save settings.",
+          variant: "destructive",
+        });
+        return;
+      }
 
       const settingsData = {
         api_key: apiKey,
@@ -61,8 +84,16 @@ const DashboardSettings = () => {
         endpoint_leased: endpoints.leased,
         endpoint_for_lease: endpoints.forLease,
         endpoint_sold: endpoints.sold,
-        user_id: (await supabase.auth.getUser()).data.user?.id,
+        user_id: user.id,
       };
+
+      const { data: existingSettings, error: fetchError } = await supabase
+        .from("settings")
+        .select("id")
+        .eq("user_id", user.id)
+        .maybeSingle();
+
+      if (fetchError) throw fetchError;
 
       let error;
       if (existingSettings) {
