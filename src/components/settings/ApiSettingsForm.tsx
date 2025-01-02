@@ -20,7 +20,7 @@ export const ApiSettingsForm = ({ onSave }: ApiSettingsFormProps) => {
     sold: "",
   });
   
-  const { loading, fetchSettings, saveSettings, testConnection } = useSettings();
+  const { loading, fetchSettings, saveSettings } = useSettings();
   const { toast } = useToast();
 
   useEffect(() => {
@@ -67,6 +67,27 @@ export const ApiSettingsForm = ({ onSave }: ApiSettingsFormProps) => {
       onSave?.();
     } catch (error) {
       console.error("Error in handleSave:", error);
+    }
+  };
+
+  const handleSaveEndpoint = async (key: keyof typeof endpoints) => {
+    try {
+      await saveSettings({
+        api_key: apiKey,
+        bearer_token: bearerToken,
+        [`endpoint_${key.toLowerCase()}`]: endpoints[key],
+      });
+      toast({
+        title: "Success",
+        description: `${key} endpoint saved successfully.`,
+      });
+    } catch (error) {
+      console.error(`Error saving ${key} endpoint:`, error);
+      toast({
+        title: "Error",
+        description: `Failed to save ${key} endpoint.`,
+        variant: "destructive",
+      });
     }
   };
 
@@ -122,11 +143,11 @@ export const ApiSettingsForm = ({ onSave }: ApiSettingsFormProps) => {
                   className="flex-1"
                 />
                 <Button 
-                  onClick={() => testConnection(endpoints[key as keyof typeof endpoints])}
+                  onClick={() => handleSaveEndpoint(key as keyof typeof endpoints)}
                   variant="outline"
                   disabled={loading}
                 >
-                  Test
+                  Save Endpoint
                 </Button>
               </div>
             </div>
