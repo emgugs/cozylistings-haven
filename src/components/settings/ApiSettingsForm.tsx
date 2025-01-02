@@ -72,11 +72,21 @@ export const ApiSettingsForm = ({ onSave }: ApiSettingsFormProps) => {
 
   const handleSaveEndpoint = async (key: keyof typeof endpoints) => {
     try {
+      const endpointMapping: Record<string, string> = {
+        forSale: 'endpoint_for_sale',
+        leased: 'endpoint_leased',
+        forLease: 'endpoint_for_lease',
+        sold: 'endpoint_sold'
+      };
+
+      const columnName = endpointMapping[key];
+      
       await saveSettings({
         api_key: apiKey,
         bearer_token: bearerToken,
-        [`endpoint_${key.toLowerCase()}`]: endpoints[key],
+        [columnName]: endpoints[key],
       });
+      
       toast({
         title: "Success",
         description: `${key} endpoint saved successfully.`,
