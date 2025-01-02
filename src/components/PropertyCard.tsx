@@ -4,7 +4,7 @@ import { Bath, Car, BedDouble, MapPin } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 interface PropertyCardProps {
-  id: number;
+  id: string;  // Changed from number to string
   name: string;
   price: string;
   image: string;
