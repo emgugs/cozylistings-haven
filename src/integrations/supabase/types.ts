@@ -9,6 +9,54 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      properties: {
+        Row: {
+          address: string
+          baths: number | null
+          beds: number | null
+          cars: number | null
+          created_at: string
+          external_id: string | null
+          id: string
+          image: string | null
+          listing_type: string
+          name: string
+          price: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          address: string
+          baths?: number | null
+          beds?: number | null
+          cars?: number | null
+          created_at?: string
+          external_id?: string | null
+          id?: string
+          image?: string | null
+          listing_type: string
+          name: string
+          price: string
+          status: string
+          updated_at?: string
+        }
+        Update: {
+          address?: string
+          baths?: number | null
+          beds?: number | null
+          cars?: number | null
+          created_at?: string
+          external_id?: string | null
+          id?: string
+          image?: string | null
+          listing_type?: string
+          name?: string
+          price?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       settings: {
         Row: {
           api_key: string
