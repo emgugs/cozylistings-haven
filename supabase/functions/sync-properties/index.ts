@@ -54,19 +54,12 @@ serve(async (req) => {
 
           const properties = await response.json();
 
-          // Process each property
+          // Process each property - only store IDs
           for (const prop of properties) {
             const propertyData = {
               external_id: prop.id?.toString(),
-              name: prop.headline || 'Unnamed Property',
-              price: prop.price?.display || 'Price on Application',
-              image: prop.images?.[0]?.url,
-              baths: prop.bathrooms,
-              beds: prop.bedrooms,
-              cars: prop.carSpaces,
-              address: `${prop.address?.streetNumber || ''} ${prop.address?.street || ''}, ${prop.address?.suburb || ''}, ${prop.address?.state || ''}`,
-              status: endpoint.status,
               listing_type: endpoint.type,
+              status: endpoint.status,
             };
 
             // Upsert the property

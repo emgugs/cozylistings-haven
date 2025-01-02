@@ -10,7 +10,34 @@ const fetchProperties = async () => {
     .order('created_at', { ascending: false });
 
   if (error) throw error;
-  return data;
+
+  // Fetch property details for each ID
+  const propertiesWithDetails = await Promise.all(
+    data.map(async (property) => {
+      try {
+        const { data: functionUrl } = await supabase.functions.invoke('vaultre-proxy', {
+          body: JSON.stringify({ endpoint: `https://ap-southeast-2.api.vaultre.com.au/api/v1.3/properties/${property.external_id}` }),
+        });
+
+        // Map API response to our PropertyCard props
+        return {
+          id: property.id,
+          name: functionUrl.headline || 'Unnamed Property',
+          price: functionUrl.price?.display || 'Price on Application',
+          image: functionUrl.images?.[0]?.url,
+          baths: functionUrl.bathrooms,
+          beds: functionUrl.bedrooms,
+          cars: functionUrl.carSpaces,
+          address: `${functionUrl.address?.streetNumber || ''} ${functionUrl.address?.street || ''}, ${functionUrl.address?.suburb || ''}, ${functionUrl.address?.state || ''}`,
+        };
+      } catch (error) {
+        console.error(`Error fetching details for property ${property.external_id}:`, error);
+        return null;
+      }
+    })
+  );
+
+  return propertiesWithDetails.filter(Boolean);
 };
 
 const PropertyGrid = () => {
