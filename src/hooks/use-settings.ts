@@ -5,10 +5,10 @@ import { useToast } from "@/hooks/use-toast";
 interface Settings {
   api_key: string;
   bearer_token: string;
-  endpoint_for_sale: string;
-  endpoint_leased: string;
-  endpoint_for_lease: string;
-  endpoint_sold: string;
+  endpoint_for_sale?: string;
+  endpoint_leased?: string;
+  endpoint_for_lease?: string;
+  endpoint_sold?: string;
 }
 
 export const useSettings = () => {
@@ -37,7 +37,7 @@ export const useSettings = () => {
     }
   };
 
-  const saveSettings = async (settings: Partial<Settings>) => {
+  const saveSettings = async (settings: Settings) => {
     setLoading(true);
     try {
       const { data: { session } } = await supabase.auth.getSession();
@@ -66,7 +66,9 @@ export const useSettings = () => {
           .update(settingsData)
           .eq("id", existingSettings.id));
       } else {
-        ({ error } = await supabase.from("settings").insert([settingsData]));
+        ({ error } = await supabase
+          .from("settings")
+          .insert(settingsData));
       }
 
       if (error) throw error;

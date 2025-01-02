@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { useSettings } from "@/hooks/use-settings";
+import { useToast } from "@/hooks/use-toast";
 
 interface ApiSettingsFormProps {
   onSave?: () => void;
@@ -20,6 +21,7 @@ export const ApiSettingsForm = ({ onSave }: ApiSettingsFormProps) => {
   });
   
   const { loading, fetchSettings, saveSettings, testConnection } = useSettings();
+  const { toast } = useToast();
 
   useEffect(() => {
     loadSettings();
@@ -45,6 +47,15 @@ export const ApiSettingsForm = ({ onSave }: ApiSettingsFormProps) => {
 
   const handleSave = async () => {
     try {
+      if (!apiKey || !bearerToken) {
+        toast({
+          title: "Validation Error",
+          description: "API Key and Bearer Token are required fields.",
+          variant: "destructive",
+        });
+        return;
+      }
+
       await saveSettings({
         api_key: apiKey,
         bearer_token: bearerToken,
@@ -64,24 +75,26 @@ export const ApiSettingsForm = ({ onSave }: ApiSettingsFormProps) => {
       <Card className="p-6 space-y-6">
         <div className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="apiKey">X-Api-Key</Label>
+            <Label htmlFor="apiKey">X-Api-Key *</Label>
             <Input
               id="apiKey"
               value={apiKey}
               onChange={(e) => setApiKey(e.target.value)}
               placeholder="Enter your API key"
               type="password"
+              required
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="bearerToken">Bearer Token</Label>
+            <Label htmlFor="bearerToken">Bearer Token *</Label>
             <Input
               id="bearerToken"
               value={bearerToken}
               onChange={(e) => setBearerToken(e.target.value)}
               placeholder="Enter your Bearer token"
               type="password"
+              required
             />
           </div>
         </div>
